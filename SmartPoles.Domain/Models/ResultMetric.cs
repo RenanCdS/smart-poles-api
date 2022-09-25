@@ -5,6 +5,6 @@ namespace SmartPoles.Domain.Models
     public class ResultMetric
     {
         public Metric Metric { get; set; }
-        public IEnumerable<(double, string)> Values { get; set; }
+        public object[] Value { get; set; }
     }
 }

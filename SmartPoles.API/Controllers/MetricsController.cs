@@ -16,7 +16,7 @@ namespace SmartPoles.API.Controllers
         [HttpGet("{condominiumName}")]
         public async Task<IActionResult> GetMetricsByCondominium(string condominiumName)
         {
-            var result = await _prometheusRepository.GetAverageByMetricAndCondominium("temperature", condominiumName);
+            var result = await _prometheusRepository.GetAverageByMetricAndCondominiumAsync("node_cpu_seconds_total", condominiumName);
             return Ok(result);
         }
     }
