@@ -58,6 +58,49 @@ namespace SmartPoles.Data.Repositories
             return ResultObject<FormattedMetric>.Ok(formattedMetric);
         }
 
+        public async Task<ResultObject<IotDataResponse>> GetMetricAverageAsync(double condominium, string metricName)
+        {
+            try
+            {   
+                var currentMetric = await GetAverageByMetricAndCondominiumAsync(condominium, metricName, 1);
+                var hourMetric = await GetAverageByMetricAndCondominiumAsync(condominium, metricName, HOUR_IN_MINUTES);
+                var dayMetric = await GetAverageByMetricAndCondominiumAsync(condominium, metricName, DAY_IN_MINUTES);
+                var weekMetric = await GetAverageByMetricAndCondominiumAsync(condominium, metricName, WEEK_IN_MINUTES);
+
+                var error = GetErrorResponse<FormattedMetric>(currentMetric, hourMetric, dayMetric, weekMetric);
+                if (error is not null)
+                {
+                    return ResultObject<IotDataResponse>.Error(error.ErrorMessage);
+                }
+
+                var iotDataResponse = new IotDataResponse()
+                {
+                    Current = currentMetric.Value.MetricAverage,
+                    HourAverage = hourMetric.Value.MetricAverage,
+                    DayAverage = dayMetric.Value.MetricAverage,
+                    WeekAverage = weekMetric.Value.MetricAverage,
+                };
+                return ResultObject<IotDataResponse>.Ok(iotDataResponse);
+            }
+            catch (Exception ex)
+            {
+                 _logger.LogError(ex, $"There has been an error recovering the metric {metricName}");
+                throw;
+            }
+        }
+
+        private ResultObject<T> GetErrorResponse<T>(params ResultObject<T>[] resultObjects)
+        {
+
+            var error = resultObjects.FirstOrDefault(metricResponse => !metricResponse.IsSuccess);
+            if (error is not null)
+            {
+                return ResultObject<T>.Error(error.ErrorMessage);
+            }
+
+            return null;
+        }
+
         public async Task<ResultObject<CommonIoTDataResponse>> GetCommonIotDataByCondominiumAsync(double condominium)
         {
             try
@@ -84,7 +127,10 @@ namespace SmartPoles.Data.Repositories
                     currentSound, hourSound, daySound, weekSound
                 };
 
-                var error = metricsResponses.FirstOrDefault(metricResponse => !metricResponse.IsSuccess);
+                var error = GetErrorResponse<FormattedMetric>(currentTemperature, hourTemperature, dayTemperature, weekTemperature,
+                    currentHumidity, hourHumidity, dayHumidity, weekHumidity,
+                    currentSound, hourSound, daySound, weekSound);
+
                 if (error is not null)
                 {
                     return ResultObject<CommonIoTDataResponse>.Error(error.ErrorMessage);
@@ -92,21 +138,21 @@ namespace SmartPoles.Data.Repositories
 
                 var response = new CommonIoTDataResponse()
                 {
-                    Temperature = new CommonIoTData()
+                    Temperature = new IotDataResponse()
                     {
                         Current = currentTemperature.Value.MetricAverage,
                         HourAverage = hourTemperature.Value.MetricAverage,
                         DayAverage = dayTemperature.Value.MetricAverage,
                         WeekAverage = weekTemperature.Value.MetricAverage,
                     },
-                    Humidity = new CommonIoTData()
+                    Humidity = new IotDataResponse()
                     {
                         Current = currentHumidity.Value.MetricAverage,
                         HourAverage = hourHumidity.Value.MetricAverage,
                         DayAverage = dayHumidity.Value.MetricAverage,
                         WeekAverage = weekHumidity.Value.MetricAverage,
                     },
-                    Sound = new CommonIoTData()
+                    Sound = new IotDataResponse()
                     {
                         Current = currentSound.Value.MetricAverage,
                         HourAverage = hourSound.Value.MetricAverage,

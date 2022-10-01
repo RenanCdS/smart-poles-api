@@ -2,12 +2,12 @@ namespace SmartPoles.Domain.DTOs
 {
     public class CommonIoTDataResponse
     {
-        public CommonIoTData Temperature { get; set; }
-        public CommonIoTData Humidity { get; set; }
-        public CommonIoTData Sound { get; set; }
+        public IotDataResponse Temperature { get; set; }
+        public IotDataResponse Humidity { get; set; }
+        public IotDataResponse Sound { get; set; }
     }
 
-    public class CommonIoTData 
+    public class IotDataResponse
     {
         public double Current { get; set; }
         public double HourAverage { get; set; }

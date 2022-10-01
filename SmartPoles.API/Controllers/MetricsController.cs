@@ -24,7 +24,20 @@ namespace SmartPoles.API.Controllers
             {
                 return BadRequest(result.ErrorMessage);
             }
-            return Ok(result);
+            return Ok(result.Value);
+        }
+
+        [HttpGet()]
+        [Produces(typeof(IotDataResponse))]
+        public async Task<IActionResult> GetMetricsByCondominium([FromQuery] double condominiumCode, [FromQuery] string metricName)
+        {
+            var result = await _prometheusRepository.GetMetricAverageAsync(condominiumCode, metricName);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            return Ok(result.Value);
         }
     }
 }
