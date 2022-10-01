@@ -9,6 +9,7 @@ namespace SmartPoles.IOC
         public static IServiceCollection AddRepositories(this IServiceCollection services) 
         {
             services.AddSingleton<IMetricRepository, PrometheusRepository>();
+            services.AddSingleton<IStorageRepository, S3Repository>();
             return services;
         }
     }

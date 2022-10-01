@@ -9,11 +9,21 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddRepositories();
+var env = builder.Environment;
+builder.Configuration.AddEnvironmentVariables();
+builder.Configuration
+.SetBasePath(Directory.GetCurrentDirectory())
+.AddJsonFile("appsettings.json")
+.AddJsonFile($"appsettings.{env.EnvironmentName}.json")
+.AddEnvironmentVariables().Build();
+
+var prometheusUrl = builder.Configuration["PrometheusUrl"]; 
 
 builder.Services.AddHttpClient("Prometheus", httpClient =>
 {
-    httpClient.BaseAddress = new Uri("http://localhost:9090");
+    httpClient.BaseAddress = new Uri(prometheusUrl);
 });
+
 
 var app = builder.Build();
 app.UseSwagger();
