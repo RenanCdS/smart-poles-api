@@ -1,6 +1,4 @@
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
 using SmartPoles.Domain.Interfaces;
 using System.Text.Json;
 using SmartPoles.Domain.Models;
@@ -30,7 +28,8 @@ namespace SmartPoles.Data.Repositories
 
         public async Task<ResultObject<FormattedMetric>> GetAverageByMetricAndCondominiumAsync(double condominiumCode, string metric, int minutes = 0)
         {
-            var query = "sum(sum_over_time({__name__=\"" + metric + "\"}[" + minutes + "m]))/sum(count_over_time({__name__=\"" + metric + "\"}[" + minutes +"m]))";
+            var query = "sum(sum_over_time({__name__=\"" + metric + "\",condominium=\"" 
+            + condominiumCode + "\"}[" + minutes + "m]))/sum(count_over_time({__name__=\"" + metric + "\", condominium=\""+ condominiumCode + "\"}[" + minutes +"m]))";
             var endpoint = $"/api/v1/query?query={query}";
             var prometheusMetrics = await _httpClient.GetAsync(endpoint);
             if (!prometheusMetrics.IsSuccessStatusCode)
@@ -45,11 +44,13 @@ namespace SmartPoles.Data.Repositories
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
 
-            var metricResult = metrics.Data.Result.FirstOrDefault();
-            if (metricResult is null)
+            var metricResults = metrics.Data.Result;
+            if (metricResults is null || metricResults.Count() == 0)
             {
                 return ResultObject<FormattedMetric>.Error("Metric was not found.");
             }
+
+            var metricResult = metricResults.FirstOrDefault();
 
             var metricAverage = Convert.ToDouble((metricResult.Value[1].ToString()));
             var formattedMetric = new FormattedMetric(metricResult.Metric.Name, Math.Round(metricAverage, 2));
@@ -57,7 +58,7 @@ namespace SmartPoles.Data.Repositories
             return ResultObject<FormattedMetric>.Ok(formattedMetric);
         }
 
-        public async Task<CommonIoTDataResponse> GetCommonIotDataByCondominiumAsync(double condominium)
+        public async Task<ResultObject<CommonIoTDataResponse>> GetCommonIotDataByCondominiumAsync(double condominium)
         {
             try
             {
@@ -75,6 +76,19 @@ namespace SmartPoles.Data.Repositories
                 var hourSound = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], HOUR_IN_MINUTES);
                 var daySound = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], DAY_IN_MINUTES);
                 var weekSound = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], WEEK_IN_MINUTES);
+
+                var metricsResponses = new List<ResultObject<FormattedMetric>>()
+                {
+                    currentTemperature, hourTemperature, dayTemperature, weekTemperature,
+                    currentHumidity, hourHumidity, dayHumidity, weekHumidity,
+                    currentSound, hourSound, daySound, weekSound
+                };
+
+                var error = metricsResponses.FirstOrDefault(metricResponse => !metricResponse.IsSuccess);
+                if (error is not null)
+                {
+                    return ResultObject<CommonIoTDataResponse>.Error(error.ErrorMessage);
+                }
 
                 var response = new CommonIoTDataResponse()
                 {
@@ -101,7 +115,7 @@ namespace SmartPoles.Data.Repositories
                     }
                 };
                 
-                return response;
+                return  ResultObject<CommonIoTDataResponse>.Ok(response);
             }
             catch (Exception ex)
             {

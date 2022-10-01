@@ -19,6 +19,11 @@ namespace SmartPoles.API.Controllers
         public async Task<IActionResult> GetMetricsByCondominium(double condominiumCode)
         {
             var result = await _prometheusRepository.GetCommonIotDataByCondominiumAsync(condominiumCode);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
             return Ok(result);
         }
     }
