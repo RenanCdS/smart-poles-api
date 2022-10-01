@@ -10,6 +10,7 @@ namespace SmartPoles.Domain.DTOs
     public class CommonIoTData 
     {
         public double Current { get; set; }
+        public double HourAverage { get; set; }
         public double DayAverage { get; set; }
         public double WeekAverage { get; set; }
     }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SmartPoles.Domain.DTOs;
 using SmartPoles.Domain.Interfaces;
 
 namespace SmartPoles.API.Controllers
@@ -13,10 +14,11 @@ namespace SmartPoles.API.Controllers
             _prometheusRepository = prometheusRepository;
         }
 
-        [HttpGet("{condominiumName}")]
-        public async Task<IActionResult> GetMetricsByCondominium(string condominiumName)
+        [HttpGet("{condominiumCode}")]
+        [Produces(typeof(CommonIoTDataResponse))]
+        public async Task<IActionResult> GetMetricsByCondominium(double condominiumCode)
         {
-            var result = await _prometheusRepository.GetAverageByMetricAndCondominiumAsync("node_cpu_seconds_total", condominiumName);
+            var result = await _prometheusRepository.GetCommonIotDataByCondominiumAsync(condominiumCode);
             return Ok(result);
         }
     }

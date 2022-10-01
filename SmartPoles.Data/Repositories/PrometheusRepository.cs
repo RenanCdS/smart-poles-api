@@ -14,7 +14,7 @@ namespace SmartPoles.Data.Repositories
         private readonly string[] COMMON_IOT_DATA = new string[] {
             "node_cpu_seconds_total",
             "node_memory_Active_bytes",
-            "node_cpu_seconds_total"
+            "process_cpu_seconds_total"
         };
 
         private readonly int HOUR_IN_MINUTES = 60;
@@ -28,12 +28,10 @@ namespace SmartPoles.Data.Repositories
             _logger = logger;
         }
 
-        public async Task<ResultObject<double>> GetAverageByMetricAndCondominiumAsync(string[] metricTags, string condominium, int minutes = 0)
+        public async Task<ResultObject<FormattedMetric>> GetAverageByMetricAndCondominiumAsync(double condominiumCode, string metric, int minutes = 0)
         {
-            // var query = "avg(" + metric + "{" + "condominium="
-            //  + condominium + "})";
-            var query = $"avg("+ "{__name__=~" + String.Join('|', metricTags) + "}) by (__name__)";
-            var endpoint = $"/api/v1/query?query={query}&start={DateTime.Now.AddMinutes(-minutes)}&end={DateTime.Now}";
+            var query = "sum(sum_over_time({__name__=\"" + metric + "\"}[" + minutes + "m]))/sum(count_over_time({__name__=\"" + metric + "\"}[" + minutes +"m]))";
+            var endpoint = $"/api/v1/query?query={query}";
             var prometheusMetrics = await _httpClient.GetAsync(endpoint);
             if (!prometheusMetrics.IsSuccessStatusCode)
             {
@@ -47,30 +45,70 @@ namespace SmartPoles.Data.Repositories
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
 
-            var metricStringResponse = metrics.Data.Result.FirstOrDefault()?.Value[1].ToString();
-            if (metricStringResponse is null)
+            var metricResult = metrics.Data.Result.FirstOrDefault();
+            if (metricResult is null)
             {
-                return ResultObject<double>.Error("Metric was not found.");
+                return ResultObject<FormattedMetric>.Error("Metric was not found.");
             }
 
-            var metricNumberResponse = Convert.ToDouble(metricStringResponse);          
-            return ResultObject<double>.Ok(Math.Round(metricNumberResponse, 2));
+            var metricAverage = Convert.ToDouble((metricResult.Value[1].ToString()));
+            var formattedMetric = new FormattedMetric(metricResult.Metric.Name, Math.Round(metricAverage, 2));
+
+            return ResultObject<FormattedMetric>.Ok(formattedMetric);
         }
 
-        public async Task<CommonIoTDataResponse> GetCommonIotDataByCondominiumAsync(string condominium)
+        public async Task<CommonIoTDataResponse> GetCommonIotDataByCondominiumAsync(double condominium)
         {
-            var requests = new List<Task<ResultObject<double>>>();
-            
-            requests.Add(GetAverageByMetricAndCondominiumAsync(COMMON_IOT_DATA, condominium, 0));
-            requests.Add(GetAverageByMetricAndCondominiumAsync(COMMON_IOT_DATA, condominium, HOUR_IN_MINUTES));
-            requests.Add(GetAverageByMetricAndCondominiumAsync(COMMON_IOT_DATA, condominium, DAY_IN_MINUTES));
-            requests.Add(GetAverageByMetricAndCondominiumAsync(COMMON_IOT_DATA, condominium, WEEK_IN_MINUTES));
+            try
+            {
+                var currentTemperature = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[0], 1);
+                var hourTemperature = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[0], HOUR_IN_MINUTES);
+                var dayTemperature = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[0], DAY_IN_MINUTES);
+                var weekTemperature = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[0], WEEK_IN_MINUTES);
 
-            await Task.WhenAll(requests);
+                var currentHumidity = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[1], 1);
+                var hourHumidity = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[1], HOUR_IN_MINUTES);
+                var dayHumidity = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[1], DAY_IN_MINUTES);
+                var weekHumidity = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[1], WEEK_IN_MINUTES);
 
-            var response = new CommonIoTDataResponse();
+                var currentSound = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], 1);
+                var hourSound = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], HOUR_IN_MINUTES);
+                var daySound = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], DAY_IN_MINUTES);
+                var weekSound = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], WEEK_IN_MINUTES);
+
+                var response = new CommonIoTDataResponse()
+                {
+                    Temperature = new CommonIoTData()
+                    {
+                        Current = currentTemperature.Value.MetricAverage,
+                        HourAverage = hourTemperature.Value.MetricAverage,
+                        DayAverage = dayTemperature.Value.MetricAverage,
+                        WeekAverage = weekTemperature.Value.MetricAverage,
+                    },
+                    Humidity = new CommonIoTData()
+                    {
+                        Current = currentHumidity.Value.MetricAverage,
+                        HourAverage = hourHumidity.Value.MetricAverage,
+                        DayAverage = dayHumidity.Value.MetricAverage,
+                        WeekAverage = weekHumidity.Value.MetricAverage,
+                    },
+                    Sound = new CommonIoTData()
+                    {
+                        Current = currentSound.Value.MetricAverage,
+                        HourAverage = hourSound.Value.MetricAverage,
+                        DayAverage = daySound.Value.MetricAverage,
+                        WeekAverage = weekSound.Value.MetricAverage,
+                    }
+                };
+                
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "There has been an error recovering the metrics.");
+                throw;
+            }
             
-            return response;
         }
     }
 }
