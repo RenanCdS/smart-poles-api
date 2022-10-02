@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Amazon.S3;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -21,9 +22,15 @@ namespace SmartPoles.Data.Repositories
             _config = new AmazonS3Config();
             _s3Client = new AmazonS3Client(accessKey, secretKey, Amazon.RegionEndpoint.USEast1);
         }
-        public IEnumerable<Condominium> GetFile(string fileName)
+        public async Task<string> GetFileAsync(string fileName, string bucket = "smart-pole-resources")
         {
-            throw new NotImplementedException();
+            var file = await _s3Client.GetObjectAsync(bucket, fileName, new CancellationToken());
+
+            using var reader = new StreamReader(file.ResponseStream);
+
+            var json = await reader.ReadToEndAsync();
+            
+            return json;
         }
     }
 }

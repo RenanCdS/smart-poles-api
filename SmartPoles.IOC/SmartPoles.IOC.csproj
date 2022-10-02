@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SmartPoles.Domain\SmartPoles.Domain.csproj" />
     <ProjectReference Include="..\SmartPoles.Data\SmartPoles.Data.csproj" />
+    <ProjectReference Include="..\SmartPoles.BLL\SmartPoles.BLL.csproj" />
   </ItemGroup>
 
 </Project>

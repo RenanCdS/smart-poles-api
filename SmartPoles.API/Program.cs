@@ -9,6 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddRepositories();
+builder.Services.AddServices();
 var env = builder.Environment;
 builder.Configuration.AddEnvironmentVariables();
 builder.Configuration

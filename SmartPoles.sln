@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartPoles.Data", "SmartPol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartPoles.IOC", "SmartPoles.IOC\SmartPoles.IOC.csproj", "{8BC5F458-C67D-4D3B-9EE9-013CA58BCF62}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartPoles.BLL", "SmartPoles.BLL\SmartPoles.BLL.csproj", "{120A201E-9324-4010-A894-F4E512147A8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,13 @@ Global
 		{8BC5F458-C67D-4D3B-9EE9-013CA58BCF62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BC5F458-C67D-4D3B-9EE9-013CA58BCF62}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BC5F458-C67D-4D3B-9EE9-013CA58BCF62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B31F322A-E096-47B3-9AEF-9018150A3EB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B31F322A-E096-47B3-9AEF-9018150A3EB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B31F322A-E096-47B3-9AEF-9018150A3EB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B31F322A-E096-47B3-9AEF-9018150A3EB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{120A201E-9324-4010-A894-F4E512147A8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{120A201E-9324-4010-A894-F4E512147A8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{120A201E-9324-4010-A894-F4E512147A8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{120A201E-9324-4010-A894-F4E512147A8D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
