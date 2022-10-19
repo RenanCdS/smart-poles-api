@@ -28,9 +28,9 @@ namespace SmartPoles.Data.Repositories
 
         public async Task<ResultObject<FormattedMetric>> GetAverageByMetricAndCondominiumAsync(double condominiumCode, string metric, int minutes = 0)
         {
-            var query = "sum(sum_over_time({__name__=\"" + metric + "\",condominium=\"" 
-            + condominiumCode + "\"}[" + minutes + "m]))/sum(count_over_time({__name__=\"" + metric + "\", condominium=\""+ condominiumCode + "\"}[" + minutes +"m]))";
+            var query = "avg_over_time(" + metric + "{condominium=\"" + condominiumCode + "\"}["+ minutes +"m])";
             var endpoint = $"/api/v1/query?query={query}";
+            _logger.LogInformation(query);
             var prometheusMetrics = await _httpClient.GetAsync(endpoint);
             if (!prometheusMetrics.IsSuccessStatusCode)
             {
