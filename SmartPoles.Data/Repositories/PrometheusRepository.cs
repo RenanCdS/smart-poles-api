@@ -67,18 +67,12 @@ namespace SmartPoles.Data.Repositories
                 var dayMetric = await GetAverageByMetricAndCondominiumAsync(condominium, metricName, DAY_IN_MINUTES);
                 var weekMetric = await GetAverageByMetricAndCondominiumAsync(condominium, metricName, WEEK_IN_MINUTES);
 
-                var error = GetErrorResponse<FormattedMetric>(currentMetric, hourMetric, dayMetric, weekMetric);
-                if (error is not null)
-                {
-                    return ResultObject<IotDataResponse>.Ok(new IotDataResponse());
-                }
-
                 var iotDataResponse = new IotDataResponse()
                 {
-                    Current = currentMetric.Value.MetricAverage,
-                    HourAverage = hourMetric.Value.MetricAverage,
-                    DayAverage = dayMetric.Value.MetricAverage,
-                    WeekAverage = weekMetric.Value.MetricAverage,
+                    Current = GetDataResponseOrZero(currentMetric),
+                    HourAverage = GetDataResponseOrZero(hourMetric),
+                    DayAverage = GetDataResponseOrZero(dayMetric),
+                    WeekAverage = GetDataResponseOrZero(weekMetric),
                 };
                 return ResultObject<IotDataResponse>.Ok(iotDataResponse);
             }
@@ -87,6 +81,11 @@ namespace SmartPoles.Data.Repositories
                  _logger.LogError(ex, $"There has been an error recovering the metric {metricName}");
                 throw;
             }
+        }
+
+        private double GetDataResponseOrZero(ResultObject<FormattedMetric> metric)
+        {
+            return metric.IsSuccess ? metric.Value.MetricAverage : 0;
         }
 
         private ResultObject<T> GetErrorResponse<T>(params ResultObject<T>[] resultObjects)
