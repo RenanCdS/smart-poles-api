@@ -10,9 +10,9 @@ namespace SmartPoles.Data.Repositories
     public class PrometheusRepository : IMetricRepository
     {
         private readonly string[] COMMON_IOT_DATA = new string[] {
-            "node_cpu_seconds_total",
-            "node_memory_Active_bytes",
-            "process_cpu_seconds_total"
+            "temperature",
+            "humidity",
+            "sound"
         };
 
         private readonly int HOUR_IN_MINUTES = 60;
@@ -70,7 +70,7 @@ namespace SmartPoles.Data.Repositories
                 var error = GetErrorResponse<FormattedMetric>(currentMetric, hourMetric, dayMetric, weekMetric);
                 if (error is not null)
                 {
-                    return ResultObject<IotDataResponse>.Error(error.ErrorMessage);
+                    return ResultObject<IotDataResponse>.Ok(new IotDataResponse());
                 }
 
                 var iotDataResponse = new IotDataResponse()

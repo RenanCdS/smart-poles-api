@@ -1,7 +1,6 @@
 using System.Text.Json;
 using SmartPoles.Domain.DTOs;
 using SmartPoles.Domain.Interfaces;
-using SmartPoles.Domain.Models;
 
 namespace SmartPoles.BLL.Services
 {
