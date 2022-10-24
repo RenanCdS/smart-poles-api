@@ -1,3 +1,4 @@
+using Serilog;
 using SmartPoles.IOC;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,14 +26,14 @@ builder.Services.AddHttpClient("Prometheus", httpClient =>
     httpClient.BaseAddress = new Uri(prometheusUrl);
 });
 
+var logger = new LoggerConfiguration()
+  .ReadFrom.Configuration(builder.Configuration)
+  .Enrich.FromLogContext()
+  .CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 var app = builder.Build();
-app.UseSwagger();
-app.UseSwaggerUI(options =>
-{
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    options.RoutePrefix = string.Empty;
-});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
