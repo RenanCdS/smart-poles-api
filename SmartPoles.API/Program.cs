@@ -35,7 +35,8 @@ builder.Logging.AddSerilog(logger);
 
 var app = builder.Build();
 
-
+app.UseHsts();
+app.UseHttpsRedirection();
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
@@ -44,7 +45,6 @@ app.UseSwaggerUI(options =>
 });
 
 app.UseAuthorization();
-app.UseHttpsRedirection();
 
 app.MapControllers();
 
