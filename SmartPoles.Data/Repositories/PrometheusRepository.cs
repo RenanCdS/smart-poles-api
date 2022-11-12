@@ -26,9 +26,18 @@ namespace SmartPoles.Data.Repositories
             _logger = logger;
         }
 
-        public async Task<ResultObject<FormattedMetric>> GetAverageByMetricAndCondominiumAsync(double condominiumCode, string metric, int minutes = 0)
+        public async Task<ResultObject<FormattedMetric>> GetMetricAndCondominiumAsync(double condominiumCode, string metric, int minutes = 0, bool isMaxMetric = false)
         {
-            var query = "avg_over_time(" + metric + "{condominium=\"" + condominiumCode + "\"}["+ minutes +"m])";
+            var query = "";
+            if (isMaxMetric)
+            {
+                query = "max_over_time(" + metric + "{condominium=\"" + condominiumCode + "\"}[" + minutes + "m])";
+            }
+            else
+            {
+                query = "avg_over_time(" + metric + "{condominium=\"" + condominiumCode + "\"}[" + minutes + "m])";
+            }
+
             var endpoint = $"/api/v1/query?query={query}";
             _logger.LogInformation(query);
             var prometheusMetrics = await _httpClient.GetAsync(endpoint);
@@ -58,14 +67,14 @@ namespace SmartPoles.Data.Repositories
             return ResultObject<FormattedMetric>.Ok(formattedMetric);
         }
 
-        public async Task<ResultObject<IotDataResponse>> GetMetricAverageAsync(double condominium, string metricName)
+        public async Task<ResultObject<IotDataResponse>> GetMetricAsync(double condominium, string metricName, bool isMaxMetric = false)
         {
             try
             {   
-                var currentMetric = await GetAverageByMetricAndCondominiumAsync(condominium, metricName, 1);
-                var hourMetric = await GetAverageByMetricAndCondominiumAsync(condominium, metricName, HOUR_IN_MINUTES);
-                var dayMetric = await GetAverageByMetricAndCondominiumAsync(condominium, metricName, DAY_IN_MINUTES);
-                var weekMetric = await GetAverageByMetricAndCondominiumAsync(condominium, metricName, WEEK_IN_MINUTES);
+                var currentMetric = await GetMetricAndCondominiumAsync(condominium, metricName, 1, isMaxMetric);
+                var hourMetric = await GetMetricAndCondominiumAsync(condominium, metricName, HOUR_IN_MINUTES, isMaxMetric);
+                var dayMetric = await GetMetricAndCondominiumAsync(condominium, metricName, DAY_IN_MINUTES, isMaxMetric);
+                var weekMetric = await GetMetricAndCondominiumAsync(condominium, metricName, WEEK_IN_MINUTES, isMaxMetric);
 
                 var iotDataResponse = new IotDataResponse()
                 {
@@ -104,20 +113,20 @@ namespace SmartPoles.Data.Repositories
         {
             try
             {
-                var currentTemperature = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[0], 1);
-                var hourTemperature = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[0], HOUR_IN_MINUTES);
-                var dayTemperature = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[0], DAY_IN_MINUTES);
-                var weekTemperature = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[0], WEEK_IN_MINUTES);
+                var currentTemperature = await GetMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[0], 1);
+                var hourTemperature = await GetMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[0], HOUR_IN_MINUTES);
+                var dayTemperature = await GetMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[0], DAY_IN_MINUTES);
+                var weekTemperature = await GetMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[0], WEEK_IN_MINUTES);
 
-                var currentHumidity = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[1], 1);
-                var hourHumidity = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[1], HOUR_IN_MINUTES);
-                var dayHumidity = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[1], DAY_IN_MINUTES);
-                var weekHumidity = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[1], WEEK_IN_MINUTES);
+                var currentHumidity = await GetMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[1], 1);
+                var hourHumidity = await GetMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[1], HOUR_IN_MINUTES);
+                var dayHumidity = await GetMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[1], DAY_IN_MINUTES);
+                var weekHumidity = await GetMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[1], WEEK_IN_MINUTES);
 
-                var currentSound = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], 1);
-                var hourSound = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], HOUR_IN_MINUTES);
-                var daySound = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], DAY_IN_MINUTES);
-                var weekSound = await GetAverageByMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], WEEK_IN_MINUTES);
+                var currentSound = await GetMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], 1);
+                var hourSound = await GetMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], HOUR_IN_MINUTES);
+                var daySound = await GetMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], DAY_IN_MINUTES);
+                var weekSound = await GetMetricAndCondominiumAsync(condominium, COMMON_IOT_DATA[2], WEEK_IN_MINUTES);
 
                 var metricsResponses = new List<ResultObject<FormattedMetric>>()
                 {
