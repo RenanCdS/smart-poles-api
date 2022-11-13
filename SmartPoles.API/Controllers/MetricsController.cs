@@ -29,9 +29,9 @@ namespace SmartPoles.API.Controllers
 
         [HttpGet()]
         [Produces(typeof(IotDataResponse))]
-        public async Task<IActionResult> GetMetricsByCondominium([FromQuery] double condominiumCode, [FromQuery] string metricName)
+        public async Task<IActionResult> GetMetricsByCondominium([FromQuery] double condominiumCode, [FromQuery] string metricName, [FromQuery] bool isMaxMetric = false)
         {
-            var result = await _prometheusRepository.GetMetricAverageAsync(condominiumCode, metricName);
+            var result = await _prometheusRepository.GetMetricAsync(condominiumCode, metricName, isMaxMetric);
 
             if (!result.IsSuccess)
             {

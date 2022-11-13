@@ -7,9 +7,9 @@ namespace SmartPoles.Domain.Interfaces
 {
     public interface IMetricRepository
     {
-        public Task<ResultObject<FormattedMetric>> GetAverageByMetricAndCondominiumAsync(double condominiumCode, string metric, int minutes = 0);
+        public Task<ResultObject<FormattedMetric>> GetMetricAndCondominiumAsync(double condominiumCode, string metric, int minutes = 0, bool isMaxMetric = false);
 
         public Task<ResultObject<CommonIoTDataResponse>> GetCommonIotDataByCondominiumAsync(double condominiumCode);
-        public Task<ResultObject<IotDataResponse>> GetMetricAverageAsync(double condominium, string metricName);
+        public Task<ResultObject<IotDataResponse>> GetMetricAsync(double condominium, string metricName, bool isMaxMetric = false);
     }
 }
