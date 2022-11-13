@@ -4,6 +4,7 @@ namespace SmartPoles.Domain.Interfaces
 {
     public interface IStorageRepository
     {
-        public Task<string> GetFileAsync(string fileName, string bucket = "smart-pole-resources");
+        Task<string> GetFileAsync(string fileName, string bucket = "smart-pole-resources");
+        Task<bool> UpdateFileAsync(string fileName, string fileText, string bucket = "smart-pole-resources");
     }
 }

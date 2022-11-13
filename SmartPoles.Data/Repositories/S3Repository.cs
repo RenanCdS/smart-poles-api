@@ -1,9 +1,8 @@
-using System.Text.Json;
 using Amazon.S3;
+using Amazon.S3.Model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SmartPoles.Domain.Interfaces;
-using SmartPoles.Domain.Models;
 
 namespace SmartPoles.Data.Repositories
 {
@@ -31,6 +30,22 @@ namespace SmartPoles.Data.Repositories
             var json = await reader.ReadToEndAsync();
             
             return json;
+        }
+
+        public async Task<bool> UpdateFileAsync(string fileName, string fileText, string bucket = "smart-pole-resources")
+        {
+            var headers = new HeadersCollection();
+            var putObjectRequest = new PutObjectRequest()
+            {
+                Key = fileName,
+                BucketName = bucket,
+                ContentBody = fileText,
+                ContentType = "application/json"
+            };
+
+            var updateResponse = await _s3Client.PutObjectAsync(putObjectRequest);
+
+            return true;
         }
     }
 }

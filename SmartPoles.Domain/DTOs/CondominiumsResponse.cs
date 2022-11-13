@@ -5,7 +5,12 @@ namespace SmartPoles.Domain.DTOs
         public CondominiumsResponse()
         {
         }
-        public List<Condominium> Condominiums { get; set; }
+
+        public CondominiumsResponse(List<Condominium> condominiums)
+        {
+            Condominiums = condominiums;
+        }
+        public List<Condominium> Condominiums { get; set; } = new List<Condominium>();
     }
 
     public class Condominium
@@ -13,7 +18,7 @@ namespace SmartPoles.Domain.DTOs
         public Condominium()
         {
         }
-        public double Code { get; set; }
+        public int Code { get; set; }
         public string Name { get; set; }
     }
 }
