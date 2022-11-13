@@ -11,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddRepositories();
 builder.Services.AddServices();
+builder.Services.AddCors();
 var env = builder.Environment;
 builder.Configuration.AddEnvironmentVariables();
 builder.Configuration
@@ -35,8 +36,11 @@ builder.Logging.AddSerilog(logger);
 
 var app = builder.Build();
 
-app.UseHsts();
-app.UseHttpsRedirection();
+app.UseCors(options =>
+  options.AllowAnyMethod()
+          .AllowAnyHeader()
+          .AllowAnyOrigin());
+
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
