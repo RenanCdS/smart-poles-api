@@ -1,0 +1,133 @@
+{
+	"info": {
+		"_postman_id": "8fbbbda0-5867-4125-8f06-2e03f8922ed6",
+		"name": "SmartPoles.API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Condominiums",
+			"item": [
+				{
+					"name": "GET - Condominiums",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/condominiums",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"condominiums"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Condominiums",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": 123,\n    \"name\": \"Condominio Parque I\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/condominiums",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"condominiums"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT - Condominiums",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": 123,\n    \"name\": \"Condominio Area Verde III\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/condominiums",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"condominiums"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE - Condominiums",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/condominiums/123",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"condominiums",
+								"123"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "GET - Metrics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/metrics?condominiumCode=123&metricName=temperature",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"metrics"
+					],
+					"query": [
+						{
+							"key": "condominiumCode",
+							"value": "123"
+						},
+						{
+							"key": "metricName",
+							"value": "temperature"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
