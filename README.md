@@ -1,6 +1,6 @@
 # Smart Poles API
 
-API responsável que atua como proxy para consultas de métricas (temperatura, umidade e som) no Prometheus e gerenciamento de condomínios.
+API que atua como proxy para consultas de métricas (temperatura, umidade e som) no Prometheus e gerenciamento de condomínios armazenados no S3.
 
 ## Fluxo de consulta de métricas
 
